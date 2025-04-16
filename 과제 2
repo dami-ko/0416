@@ -1,0 +1,37 @@
+import xml.etree.ElementTree as ET
+import pandas as pd
+import io
+
+from google.colab import files
+uploaded = files.upload()  # Upload your 'book.xml'
+
+filename = list(uploaded.keys())[0]  
+
+# XML 파일 열기 - Updated path
+tree = ET.parse('book.xml')  
+root = tree.getroot()
+
+# XML 파일 열기
+tree = ET.parse(io.BytesIO(uploaded[filename]))  
+root = tree.getroot()
+
+from google.colab import files
+uploaded = files.upload()
+
+# 각 book 요소에서 데이터 추출
+books = []
+for book in root.findall('book'):
+    book_data = {
+        'id': book.get('id'),
+        'title': book.findtext('title'),
+        'author': book.findtext('author'),
+        'price': float(book.findtext('price')),
+        'genre': book.findtext('genre')
+    }
+    books.append(book_data)
+
+# DataFrame으로 변환
+df_xml = pd.DataFrame(books)
+
+# 결과 출력
+print(df_xml.head())
